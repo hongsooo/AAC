@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ['열나요', '어지러워요', '머리가 아파요'],
     ['눈', '코', '입', '귀'],
     ['목이 부었어요', '목이 아파요', '목이 간지러워요', '목이 따끔 거려요'],
-    ['체했어요', '차요', '토를 해요', '설사를 해요', '변비가 심해요', '배가 아파요'],
+    ['체했어요', '차가워요', '토를 해요', '설사를 해요', '변비가 심해요', '배가 아파요'],
     ['몸이 아파요', '욱신욱신해요', '열나요']
   ];
 
@@ -81,7 +81,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           i,
                           InkWell(
                             child: Card(
-                              child: Center(child: Text(e)),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Image.asset('images/1-$i.JPG', width: 70),
+                                    Text(e),
+                                  ],
+                                ),
+                              ),
                             ),
                             onTap: () {
                               setState(() {
@@ -102,7 +109,14 @@ class _MyHomePageState extends State<MyHomePage> {
                               i,
                               InkWell(
                                 child: Card(
-                                  child: Center(child: Text(e.toString())),
+                                  child: Center(
+                                    child: Column(
+                                      children: [
+                                        Image.asset('images/2-$selectedItemIndex-$i.JPG', width: 70),
+                                        Text(e.toString()),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                                 onTap: () {
                                   if (selectedItemIndex == 1) {
@@ -124,7 +138,14 @@ class _MyHomePageState extends State<MyHomePage> {
                               i,
                               InkWell(
                                 child: Card(
-                                  child: Center(child: Text(e.toString())),
+                                  child: Center(
+                                    child: Column(
+                                      children: [
+                                        Image.asset('images/3-$selectedItemIndex-$i.JPG', width: 70),
+                                        Text(e.toString()),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                                 onTap: () {
                                   setState(() {});
