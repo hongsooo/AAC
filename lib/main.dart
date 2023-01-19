@@ -10,11 +10,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '삐뽀삐뽀 Talk',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      home: const MyHomePage(title: '삐뽀삐뽀 Talk'),
     );
   }
 }
@@ -27,6 +28,14 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
+
+// TODO
+// 1. 1(초기화면), 2(안내문구) 페이지 추가 - 페이지에 앞뒤 버튼(<- ->) 존재 - 완료
+// 2. 증상 가이드 텍스트 추가 - 완료
+//     1. 어디가 아픈가요?
+//     2. 어떻게 아픈가요?
+//     3. 얼마나 아픈가요?
+// 3. 3단계 (얼마나 아픈가요) 이미지 및 로직 적용
 
 class _MyHomePageState extends State<MyHomePage> {
   // itemType: 1
@@ -52,113 +61,194 @@ class _MyHomePageState extends State<MyHomePage> {
   int selectedItemIndex = 0;
   int currentItemType = 1;
 
+  int currentPage = 1;
+
+  String getQuestion() {
+    if (currentItemType == 1 || (currentItemType == 2 && selectedItemIndex == 1)) {
+      return '어디가 아픈가요?';
+    } else if (currentItemType == 2 || currentItemType == 3) {
+      return '어떻게 아픈가요';
+    } else {
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Column(
-        children: [
-          TextButton(
-            onPressed: () {
-              if (currentItemType > 1) {
-                setState(() {
-                  currentItemType--;
-                });
-              }
-            },
-            child: const Text("뒤로가기"),
-          ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 3,
-              children: currentItemType == 1
-                  ? items
-                      .asMap()
-                      .map(
-                        (i, e) => MapEntry(
-                          i,
-                          InkWell(
-                            child: Card(
-                              child: Center(
-                                child: Column(
-                                  children: [
-                                    Image.asset('images/1-$i.JPG', width: 70),
-                                    Text(e),
-                                  ],
-                                ),
+      body: currentPage == 1 || currentPage == 2
+          ? Container(
+              color: const Color(0xFFFFEBB6),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Image.asset('images/intro.jpg'),
+                  ),
+                  currentPage == 2
+                      ? const Align(
+                          alignment: FractionalOffset.bottomCenter,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 230),
+                            child: Text(
+                              '화면을 보면서, 원하는 그림을 눌러주세요.',
+                              style: TextStyle(
+                                color: Color(0xFF9ADDD6),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
                               ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                  Align(
+                    alignment: FractionalOffset.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          currentPage == 2
+                              ? InkWell(
+                                  child: const Icon(
+                                    Icons.arrow_back_ios_new_rounded,
+                                    size: 100,
+                                    color: Color(0xFF9ADDD6),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      currentPage = 1;
+                                    });
+                                  },
+                                )
+                              : const SizedBox(width: 100),
+                          InkWell(
+                            child: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 100,
+                              color: Color(0xFF9ADDD6),
                             ),
                             onTap: () {
                               setState(() {
-                                selectedItemIndex = i;
-                                currentItemType = 2;
+                                currentPage = currentPage == 1 ? 2 : 3;
                               });
                             },
                           ),
-                        ),
-                      )
-                      .values
-                      .toList()
-                  : currentItemType == 2
-                      ? subItems[selectedItemIndex]
-                          .asMap()
-                          .map(
-                            (i, e) => MapEntry(
-                              i,
-                              InkWell(
-                                child: Card(
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Image.asset('images/2-$selectedItemIndex-$i.JPG', width: 70),
-                                        Text(e.toString()),
-                                      ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    if (currentItemType > 1) {
+                      setState(() {
+                        currentItemType--;
+                      });
+                    }
+                  },
+                  child: const Text("뒤로가기"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(getQuestion(), style: const TextStyle(fontSize: 18)),
+                ),
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: 3,
+                    children: currentItemType == 1
+                        ? items
+                            .asMap()
+                            .map(
+                              (i, e) => MapEntry(
+                                i,
+                                InkWell(
+                                  child: Card(
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Image.asset('images/1-$i.JPG', width: 70),
+                                          Text(e),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                onTap: () {
-                                  if (selectedItemIndex == 1) {
+                                  onTap: () {
                                     setState(() {
                                       selectedItemIndex = i;
-                                      currentItemType = 3;
+                                      currentItemType = 2;
                                     });
-                                  }
-                                },
+                                  },
+                                ),
                               ),
-                            ),
-                          )
-                          .values
-                          .toList()
-                      : faceItems[selectedItemIndex]
-                          .asMap()
-                          .map(
-                            (i, e) => MapEntry(
-                              i,
-                              InkWell(
-                                child: Card(
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Image.asset('images/3-$selectedItemIndex-$i.JPG', width: 70),
-                                        Text(e.toString()),
-                                      ],
+                            )
+                            .values
+                            .toList()
+                        : currentItemType == 2
+                            ? subItems[selectedItemIndex]
+                                .asMap()
+                                .map(
+                                  (i, e) => MapEntry(
+                                    i,
+                                    InkWell(
+                                      child: Card(
+                                        child: Center(
+                                          child: Column(
+                                            children: [
+                                              Image.asset('images/2-$selectedItemIndex-$i.JPG', width: 70),
+                                              Text(e.toString()),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        if (selectedItemIndex == 1) {
+                                          setState(() {
+                                            selectedItemIndex = i;
+                                            currentItemType = 3;
+                                          });
+                                        }
+                                      },
                                     ),
                                   ),
-                                ),
-                                onTap: () {
-                                  setState(() {});
-                                },
-                              ),
-                            ),
-                          )
-                          .values
-                          .toList(),
+                                )
+                                .values
+                                .toList()
+                            : faceItems[selectedItemIndex]
+                                .asMap()
+                                .map(
+                                  (i, e) => MapEntry(
+                                    i,
+                                    InkWell(
+                                      child: Card(
+                                        child: Center(
+                                          child: Column(
+                                            children: [
+                                              Image.asset('images/3-$selectedItemIndex-$i.JPG', width: 70),
+                                              Text(e.toString()),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                )
+                                .values
+                                .toList(),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
