@@ -1,3 +1,5 @@
+// APK 파일 경로:
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -35,39 +37,41 @@ class MyHomePage extends StatefulWidget {
 //     1. 어디가 아픈가요?
 //     2. 어떻게 아픈가요?
 //     3. 얼마나 아픈가요?
-// 3. 3단계 (얼마나 아픈가요) 이미지 및 로직 적용
+// 3. 3단계 (얼마나 아픈가요) 이미지 및 로직 적용 - 완료
 
 class _MyHomePageState extends State<MyHomePage> {
   // itemType: 1
-  final items = ['머리', '얼굴', '목', '배', '감기'];
+  final items = ['머리', '목', '배', '감기', '눈', '코', '입', '귀'];
 
   // itemType: 2
   final subItems = [
     ['열나요', '어지러워요', '머리가 아파요'],
-    ['눈', '코', '입', '귀'],
     ['목이 부었어요', '목이 아파요', '목이 간지러워요', '목이 따끔 거려요'],
     ['체했어요', '차가워요', '토를 해요', '설사를 해요', '변비가 심해요', '배가 아파요'],
-    ['몸이 아파요', '욱신욱신해요', '열나요']
-  ];
-
-  // itemType: 3
-  final faceItems = [
+    ['몸이 아파요', '욱신욱신해요', '열나요'],
     ['눈물이 나요', '눈이 간지러워요', '눈이 따끔거려요'],
     ['콧물이 나요', '재채기를 해요', '코가 막혔어요'],
     ['기침나요', '입안이 깔깔해요'],
     ['귀가 먹먹해요', '귀가 간지러워요', '귀가 아파요']
   ];
 
-  int selectedItemIndex = 0;
-  int currentItemType = 1;
+  // itemType: 3
+  final levelItems = ['가끔 아파요', '조금 아파요', '많이 아파요', '증세가 심해지고 있어요'];
 
   int currentPage = 1;
+  int currentItemType = 1;
+  int selectedItemIndex = -1;
+  int selectedSubItemIndex = -1;
+  int selectedSubItemSubIndex = -1;
+  int selectedLevelItemIndex = -1;
 
   String getQuestion() {
-    if (currentItemType == 1 || (currentItemType == 2 && selectedItemIndex == 1)) {
+    if (currentItemType == 1) {
       return '어디가 아픈가요?';
-    } else if (currentItemType == 2 || currentItemType == 3) {
-      return '어떻게 아픈가요';
+    } else if (currentItemType == 2) {
+      return '어떻게 아픈가요?';
+    } else if (currentItemType == 3) {
+      return '얼마나 아픈가요?';
     } else {
       return '';
     }
@@ -156,6 +160,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: const Text("뒤로가기"),
                 ),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                      spacing: 8,
+                      direction: Axis.vertical,
+                      children: [
+                        Text('어디가 아픈가요? ${selectedItemIndex > -1 ? items[selectedItemIndex] : ''}'),
+                        Text(
+                            '어떻게 아픈가요? ${selectedSubItemIndex > -1 && selectedSubItemSubIndex > -1 ? subItems[selectedSubItemIndex][selectedSubItemSubIndex] : ''}'),
+                        Text('얼마나 아픈가요? ${selectedLevelItemIndex > -1 ? levelItems[selectedLevelItemIndex] : ''}'),
+                      ],
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(getQuestion(), style: const TextStyle(fontSize: 18)),
@@ -173,6 +192,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Card(
                                     child: Center(
                                       child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Image.asset('images/1-$i.JPG', width: 70),
                                           Text(e),
@@ -183,7 +204,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   onTap: () {
                                     setState(() {
                                       selectedItemIndex = i;
-                                      currentItemType = 2;
+                                      selectedSubItemIndex = i;
+                                      selectedSubItemSubIndex = -1;
+                                      selectedLevelItemIndex = -1;
+                                      currentItemType++;
                                     });
                                   },
                                 ),
@@ -192,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             .values
                             .toList()
                         : currentItemType == 2
-                            ? subItems[selectedItemIndex]
+                            ? subItems[selectedSubItemIndex]
                                 .asMap()
                                 .map(
                                   (i, e) => MapEntry(
@@ -201,27 +225,28 @@ class _MyHomePageState extends State<MyHomePage> {
                                       child: Card(
                                         child: Center(
                                           child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Image.asset('images/2-$selectedItemIndex-$i.JPG', width: 70),
+                                              Image.asset('images/2-$selectedSubItemIndex-$i.JPG', width: 70),
                                               Text(e.toString()),
                                             ],
                                           ),
                                         ),
                                       ),
                                       onTap: () {
-                                        if (selectedItemIndex == 1) {
-                                          setState(() {
-                                            selectedItemIndex = i;
-                                            currentItemType = 3;
-                                          });
-                                        }
+                                        setState(() {
+                                          selectedSubItemSubIndex = i;
+                                          selectedLevelItemIndex = -1;
+                                          currentItemType++;
+                                        });
                                       },
                                     ),
                                   ),
                                 )
                                 .values
                                 .toList()
-                            : faceItems[selectedItemIndex]
+                            : levelItems
                                 .asMap()
                                 .map(
                                   (i, e) => MapEntry(
@@ -230,15 +255,19 @@ class _MyHomePageState extends State<MyHomePage> {
                                       child: Card(
                                         child: Center(
                                           child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Image.asset('images/3-$selectedItemIndex-$i.JPG', width: 70),
+                                              Image.asset('images/3-$i.JPG', width: 70),
                                               Text(e.toString()),
                                             ],
                                           ),
                                         ),
                                       ),
                                       onTap: () {
-                                        setState(() {});
+                                        setState(() {
+                                          selectedLevelItemIndex = i;
+                                        });
                                       },
                                     ),
                                   ),
