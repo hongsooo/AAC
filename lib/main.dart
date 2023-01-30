@@ -1,4 +1,4 @@
-// APK 파일 다운로드 경로: https://shorturl.at/vT256
+// APK 파일 다운로드 경로: https://shorturl.at/hxCK8
 
 import 'package:flutter/material.dart';
 
